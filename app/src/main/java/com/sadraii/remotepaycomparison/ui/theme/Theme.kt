@@ -7,9 +7,14 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 
 private val DarkColorPalette = darkColors(
-    primary = Purple200,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = PrimaryLightColor,
+    primaryVariant = PrimaryColor,
+    onPrimary = PrimaryTextColor,
+    secondary = SecondaryLightColor,
+    secondaryVariant = SecondaryColor,
+    onSecondary = SecondaryTextColor,
+    background = PrimaryDarkColor,
+    surface = SecondaryDarkColor
 )
 
 private val LightColorPalette = lightColors(
@@ -32,14 +37,15 @@ fun RemotePayComparisonTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable() () -> Unit
 ) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
+    // TODO Figure out light colors
+//    val colors = if (darkTheme) {
+//        DarkColorPalette
+//    } else {
+//        LightColorPalette
+//    }
 
     MaterialTheme(
-        colors = colors,
+        colors = LightColorPalette,
         typography = Typography,
         shapes = Shapes,
         content = content
