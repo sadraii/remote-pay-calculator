@@ -5,6 +5,6 @@
     <string name="remote_salary_input_label">Remote salary</string>
     <string name="remote_state_input_label">Remote state</string>
     <string name="salary_input_placeholder">Enter salary</string>
-    <string name="tax_difference_summary">Going from %1$s to %2$s, you would earn %3$s and pay %4$s in taxes.</string>
-    <string name="tax_difference_total_summary">This leaves you with %1$s in your pocket.</string>
+    <string name="tax_difference_summary">Going from %1$s to %2$s, you would earn $%3$s and pay $%4$s in taxes.</string>
+    <string name="tax_difference_total_summary">This leaves you with $%1$s in your pocket.</string>
 </resources>

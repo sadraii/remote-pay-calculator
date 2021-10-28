@@ -16,37 +16,37 @@ class NoTaxTests {
 
     @Test
     fun noTaxMethod_noIncome_notTaxed() {
-        val actualIncome = 0
+        val actualIncome = "0"
 
         val tax = calculateTax(actualIncome, florida)
 
-        Assert.assertEquals(0.0, tax.total, 0.0)
+        Assert.assertEquals("0.0", tax.total)
     }
 
     @Test
     fun noTaxMethod_lowIncome_notTaxed() {
-        val actualIncome = 500
+        val actualIncome = "500"
 
         val tax = calculateTax(actualIncome, florida)
 
-        Assert.assertEquals(0.0, tax.total, 0.0)
+        Assert.assertEquals("0.0", tax.total)
     }
 
     @Test
     fun noTaxMethod_medIncome_notTaxed() {
-        val actualIncome = 123_456
+        val actualIncome = "123456"
 
         val tax = calculateTax(actualIncome, florida)
 
-        Assert.assertEquals(0.0, tax.total, 0.0)
+        Assert.assertEquals("0.0", tax.total)
     }
 
     @Test
     fun noTaxMethod_highIncome_notTaxed() {
-        val actualIncome = 1_234_567
+        val actualIncome = "1234567"
 
         val tax = calculateTax(actualIncome, florida)
 
-        Assert.assertEquals(0.0, tax.total, 0.0)
+        Assert.assertEquals("0.0", tax.total)
     }
 }

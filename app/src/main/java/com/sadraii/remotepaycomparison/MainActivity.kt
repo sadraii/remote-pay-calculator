@@ -8,17 +8,25 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.outlined.AccessAlarm
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.sadraii.remotepaycomparison.data.State
 import com.sadraii.remotepaycomparison.ui.theme.RemotePayComparisonTheme
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 class MainActivity : ComponentActivity() {
 
@@ -46,7 +54,7 @@ fun MainScreen(viewModel: MainViewModel) {
     Column(
         modifier = Modifier
             .padding(16.dp)
-            .fillMaxWidth()
+            .fillMaxSize()
     ) {
         StateIncomeUserInput(
             modifier = Modifier.fillMaxWidth(),
@@ -86,15 +94,15 @@ fun MainScreen(viewModel: MainViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         if (viewModel.taxCalculated) {
-            val salaryDiff = viewModel.originalSalary.toDouble() - viewModel.remoteSalary.toDouble()
+            val salaryDiff = BigDecimal(viewModel.originalSalary) - BigDecimal(viewModel.remoteSalary)
             val salaryLessMore = when {
-                salaryDiff > 0 -> "$salaryDiff less"
-                salaryDiff < 0 -> "${-salaryDiff} more"
+                salaryDiff > BigDecimal.ZERO -> "${salaryDiff.trimZero()} less"
+                salaryDiff < BigDecimal.ZERO -> "${-salaryDiff.trimZero()} more"
                 else -> "the same"
             }
             val taxLessMore = when {
-                viewModel.taxDifference > 0 -> "${viewModel.taxDifference} less"
-                viewModel.taxDifference < 0 -> "${-viewModel.taxDifference} more"
+                viewModel.taxDifference > BigDecimal.ZERO -> "${viewModel.taxDifference.trimZero()} less"
+                viewModel.taxDifference < BigDecimal.ZERO -> "${-viewModel.taxDifference.trimZero()} more"
                 else -> "the same"
             }
             val taxDifferenceSummary = stringResource(
@@ -105,12 +113,10 @@ fun MainScreen(viewModel: MainViewModel) {
                 taxLessMore
             )
             Text(taxDifferenceSummary)
-            // 50k less and 10k less
-            // This leaves you with %1$s in your pocket.
             val totalDiff = salaryDiff - viewModel.taxDifference
             val totalLessMore = when {
-                totalDiff > 0 -> "$totalDiff less"
-                totalDiff < 0 -> "${-totalDiff} more"
+                totalDiff > BigDecimal.ZERO -> "${totalDiff.trimZero()} less"
+                totalDiff < BigDecimal.ZERO -> "${-totalDiff.trimZero()} more"
                 else -> "the same"
             }
             val taxDiffTotalSummary = stringResource(
@@ -121,6 +127,17 @@ fun MainScreen(viewModel: MainViewModel) {
             Text(taxDiffTotalSummary)
         }
     }
+}
+
+/**
+ * If it's an integer, remove trailing zeros. Otherwise, round to 2 decimals.
+ */
+fun BigDecimal.trimZero(): BigDecimal {
+    return if (isInt()) setScale(0) else setScale(2, RoundingMode.HALF_UP)
+}
+
+fun BigDecimal.isInt(): Boolean {
+    return signum() == 0 || scale() <= 0 || stripTrailingZeros().scale() <= 0
 }
 
 @ExperimentalComposeUiApi
@@ -179,11 +196,21 @@ fun StateIncomeUserInput(
         OutlinedTextField(
             modifier = modifier,
             value = salary,
-            onValueChange = { newValue ->
-                onSalaryChange(newValue.trimStart('0'))
+            onValueChange = { newText ->
+                val newValue = newText.replace(Regex("[ ,-]"), "")
+                onSalaryChange(when {
+                    newValue.isBlank() || newValue == "0" -> "0"
+                    else -> newValue.trimStart('0')
+                })
             },
             label = { Text(textFieldLabel) },
             placeholder = { Text(textFieldPlaceholder) },
+//            visualTransformation = {
+//                TransformedText(
+//                    AnnotatedString("$${it.text}"),
+//                    OffsetMapping.Identity
+//                )
+//            },
             singleLine = true,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,

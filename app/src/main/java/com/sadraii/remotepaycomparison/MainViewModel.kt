@@ -8,8 +8,9 @@ import com.sadraii.remotepaycomparison.data.CalculatedTax
 import com.sadraii.remotepaycomparison.data.DataUtils.calculateTax
 import com.sadraii.remotepaycomparison.data.StateData
 import com.sadraii.remotepaycomparison.data.StateData.getState
+import java.math.BigDecimal
 
-class MainViewModel() : ViewModel() {
+class MainViewModel : ViewModel() {
 
     var originalState by mutableStateOf("")
         private set
@@ -29,7 +30,7 @@ class MainViewModel() : ViewModel() {
 
     var taxCalculated by mutableStateOf(false)
         private set
-    var taxDifference by mutableStateOf<Double>(0.0)
+    var taxDifference by mutableStateOf<BigDecimal>(BigDecimal("0.0"))
         private set
 
     fun onSelectOriginalState(state: String) {
@@ -49,9 +50,9 @@ class MainViewModel() : ViewModel() {
     }
 
     fun onClickCalculate() {
-        originalTax = calculateTax(originalSalary.toInt(), getState(originalState))
-        remoteTax = calculateTax(remoteSalary.toInt(), getState(remoteState))
-        taxDifference = originalTax.total - remoteTax.total
+        originalTax = calculateTax(originalSalary, getState(originalState))
+        remoteTax = calculateTax(remoteSalary, getState(remoteState))
+        taxDifference = BigDecimal(originalTax.total) - BigDecimal(remoteTax.total)
         taxCalculated = true
     }
 }

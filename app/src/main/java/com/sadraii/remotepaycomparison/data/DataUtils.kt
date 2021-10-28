@@ -1,43 +1,47 @@
 package com.sadraii.remotepaycomparison.data
 
+import com.sadraii.remotepaycomparison.data.StateTaxMethod.*
+import java.math.BigDecimal
+
 object DataUtils {
-    fun calculateTax(income: Int, forState: State): CalculatedTax {
+    fun calculateTax(income: String, forState: State): CalculatedTax {
         return when (forState.taxMethod) {
-            StateTaxMethod.NONE -> CalculatedTax()
-            StateTaxMethod.FLAT -> {
+            NONE -> CalculatedTax()
+            FLAT -> {
                 val total =
-                    income * requireNotNull(forState.taxBracketsSingle?.first()?.rate) { "Flat tax rate not found for ${forState.name}" }
-                CalculatedTax(total = total)
+                    BigDecimal(income) * BigDecimal(requireNotNull(forState.taxBracketsSingle?.first()?.rate) { "Flat tax rate not found for ${forState.name}" })
+                CalculatedTax(total.toString())
             }
-            StateTaxMethod.PROGRESSIVE -> {
-                var remainingIncome = income
-                var total = 0.0
-                var bracket: Int
-                val perBracket: MutableList<Double> = mutableListOf()
+            PROGRESSIVE -> {
+                var remainingIncome = BigDecimal(income)
+                var bracketRange = BigDecimal("0")
+                var total = BigDecimal("0")
+                val bracketTotals: MutableList<BigDecimal> = mutableListOf()
 
                 forState.taxBracketsSingle?.forEach loop@{ taxBracket ->
-                    if (remainingIncome <= 0) return@loop
+                    if (remainingIncome <= BigDecimal.ZERO) return@loop
 
-                    bracket = taxBracket.to - taxBracket.from
+                    // Need to add 1 to count numbers correctly (e.g. 10 - 1 = 9 + 1 = 10 numbers)
+                    bracketRange = BigDecimal(taxBracket.to - taxBracket.from + 1)
 
-                    val thisBracket = if (taxBracket.to != -1 && remainingIncome > bracket) {
-                        bracket * taxBracket.rate
+                    val bracket = if (taxBracket.to != -1 && remainingIncome > bracketRange) {
+                        bracketRange * BigDecimal(taxBracket.rate)
                     } else {
-                        remainingIncome * taxBracket.rate
+                        remainingIncome * BigDecimal(taxBracket.rate)
                     }
-                    perBracket.add(thisBracket)
+                    bracketTotals.add(bracket)
 
-                    total += thisBracket
-                    remainingIncome -= bracket
+                    total += bracket
+                    remainingIncome -= bracketRange
                 }
 
-                CalculatedTax(total, perBracket)
+                CalculatedTax(total.toString(), bracketTotals)
             }
         }
     }
 }
 
 data class CalculatedTax(
-    val total: Double = 0.0,
-    val perBracket: List<Double>? = null
+    val total: String = "0.0",
+    val bracketTotals: List<BigDecimal>? = null
 )
