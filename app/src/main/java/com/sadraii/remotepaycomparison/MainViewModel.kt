@@ -28,7 +28,7 @@ class MainViewModel : ViewModel() {
     var remoteTax by mutableStateOf<CalculatedTax>(CalculatedTax())
         private set
 
-    var taxCalculated by mutableStateOf(false)
+    var isTaxCalculated by mutableStateOf(false)
         private set
     var taxDifference by mutableStateOf<BigDecimal>(BigDecimal("0.0"))
         private set
@@ -53,6 +53,6 @@ class MainViewModel : ViewModel() {
         originalTax = calculateTax(originalSalary, getState(originalState))
         remoteTax = calculateTax(remoteSalary, getState(remoteState))
         taxDifference = BigDecimal(originalTax.total) - BigDecimal(remoteTax.total)
-        taxCalculated = true
+        isTaxCalculated = true
     }
 }

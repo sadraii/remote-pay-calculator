@@ -1,19 +1,13 @@
 package com.sadraii.remotepaycomparison.data
 
-data class TaxBracket(val from: Int, val to: Int, val rate: String)
-
-enum class StateTaxMethod {
-    NONE,
-    FLAT,
-    PROGRESSIVE
-}
-
 data class State(
     val name: String,
     val taxMethod: StateTaxMethod,
     val taxBracketsSingle: List<TaxBracket>? = null,
     val taxBracketsMarried: List<TaxBracket>? = null
 )
+
+data class TaxBracket(val from: Int, val to: Int, val rate: String)
 
 object StateData {
     val states = listOf(
@@ -761,8 +755,14 @@ object StateData {
             StateTaxMethod.NONE
         )
     )
-
     fun getState(state: String): State {
         return states.first { it.name == state }
     }
+
+}
+
+enum class StateTaxMethod {
+    NONE,
+    FLAT,
+    PROGRESSIVE
 }
